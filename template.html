@@ -115,6 +115,50 @@
     onresize();
   }
 
+
+  /* Handle finger swipes on touch devices */
+
+  var touchTracker = {
+    click: 0,
+    diff: 0,
+    offset: 50,
+    // User touches screen
+    init: function(newX) {
+      this.click = newX;
+      this.diff = 0;
+    },
+    // Tracks the swipe
+    track: function(newX) {
+      this.diff = this.click - newX;
+    },
+    // Decides whether the swipe was sufficient, as well as direction
+    move: function() {
+      if (this.diff > this.offset) {
+        forward();
+      } else if (this.diff < -this.offset) {
+        back();
+      }
+    }
+  }
+
+  /* Attach touch events to document and block weird behavior */
+  
+  document.addEventListener('touchstart', function(e) {
+    e.preventDefault();
+    touchTracker.init(e.touches[0].screenX);
+  });
+  
+  document.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    touchTracker.track(e.touches[0].screenX);
+  });
+  document.addEventListener('touchend', function(e) {
+    e.preventDefault();
+    touchTracker.move();
+  });
+
+
+
   /* Handle keys */
 
   window.onkeydown = function(e) {
